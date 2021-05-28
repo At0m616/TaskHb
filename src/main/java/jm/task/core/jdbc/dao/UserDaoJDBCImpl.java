@@ -51,8 +51,8 @@ public class UserDaoJDBCImpl implements UserDao {
             Util.rollBack(connection);
             e.printStackTrace();
         } finally {
-            Util.closeConnection(connection);
             Util.closeConnection(statement);
+            Util.closeConnection(connection);
         }
     }
 
@@ -84,15 +84,11 @@ public class UserDaoJDBCImpl implements UserDao {
             connection.setAutoCommit(false);
             ResultSet resultSet = statement.executeQuery("SELECT id, name, lastname, age FROM users;");
             while (resultSet.next()) {
-                long id = resultSet.getLong("id");
-                String name = resultSet.getString("name");
-                String lastName = resultSet.getString("lastname");
-                byte age = resultSet.getByte("age");
                 User user = new User();
-                user.setId(id);
-                user.setName(name);
-                user.setLastName(lastName);
-                user.setAge(age);
+                user.setId(resultSet.getLong("id"));
+                user.setName(resultSet.getString("name"));
+                user.setLastName(resultSet.getString("lastname"));
+                user.setAge(resultSet.getByte("age"));
                 result.add(user);
                 connection.commit();
             }
@@ -109,7 +105,6 @@ public class UserDaoJDBCImpl implements UserDao {
 
         try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement()) {
-
             statement.executeUpdate("DELETE FROM users;");
         } catch (SQLException e) {
             e.printStackTrace();
